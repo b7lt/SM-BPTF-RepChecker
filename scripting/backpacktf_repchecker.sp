@@ -119,7 +119,7 @@ public void OnPluginStart()
 
     // General cvars
     cvarPluginVers = CreateConVar("bptf_repchecker_version", PLUGIN_VERSION,
-        "Current version of the plugin!");
+        "Current version of the plugin!", FCVAR_NOTIFY);
 
     cvarTimerInterval = CreateConVar("bptf_api_timer_interval", "4.0",
         "How long to wait, in seconds, before sending all client Steam IDs to the BPTF API in a batch.");
