@@ -121,63 +121,63 @@ public void OnPluginStart()
     cvarPluginVers = CreateConVar("bptf_repchecker_version", PLUGIN_VERSION,
         "Current version of the plugin!", FCVAR_NOTIFY);
 
-    cvarTimerInterval = CreateConVar("bptf_api_timer_interval", "4.0",
+    cvarTimerInterval = CreateConVar("bptf_api_timer_interval", "10.0",
         "How long to wait, in seconds, before sending all client Steam IDs to the BPTF API in a batch.");
 
     cvarPlayerRejoinRefreshDataInterval = CreateConVar("bptf_player_rejoin_refresh_data_interval", "600",
-        "If we've already retrieved a player's data before and they leave the server, this cvar controls how old their data must be, in seconds, for us to consider reacquiring it from the API");
+        "How long to wait, in seconds, before refetching a player's data from the BPTF API if they rejoin the server later.");
 
     cvarBptfApiKey = CreateConVar("bptf_api_key", "",
-        "[OPTIONAL] Backpack.TF API key, used to acquire the current refined-key rate to prettify backpack value in sm_rep", FCVAR_PROTECTED);
+        "[OPTIONAL] Backpack.TF API key, used to acquire the current refined-key rate to prettify backpack value in sm_rep & sm_baltop", FCVAR_PROTECTED);
 
     // Temp site ban cvars
     cvarTempSiteBanDealMethod = CreateConVar("bptf_temp_site_ban_deal_method", "1", 
-        "How to deal with users who are temporarily site banned from backpack.tf: \n\
+        "How to deal with users who are temporarily site-banned from backpack.tf: \n\
         0 = Disabled \n\
-        1 = Tag banned user and warn other users in chat (requires Custom Chat Colors) \n\
+        1 = Tag user and warn other users in chat (requires SCP Redux) \n\
         2 = Kick user \n\
         3 = Ban user");
     cvarTempSiteBanTag = CreateConVar("bptf_temp_site_ban_tag", "[BPTF BAN]", 
-        "Chat tag for users who are temporarily site banned from backpack.tf");
+        "Chat tag for users who are temporarily site-banned from backpack.tf");
     cvarTempSiteBanTagColor = CreateConVar("bptf_temp_site_ban_tag_color", "F09A3F",
-        "Chat tag color for users who are temporarily site banned from backpack.tf");
+        "Chat tag color for users who are temporarily site-banned from backpack.tf");
     
     // Perm site ban cvars
     cvarPermSiteBanDealMethod = CreateConVar("bptf_perm_site_ban_deal_method", "3", 
-        "How to deal with users who are permanently site banned from backpack.tf: \n\
+        "How to deal with users who are permanently site-banned from backpack.tf: \n\
         0 = Disabled \n\
-        1 = Tag banned user and warn other users in chat (requires Custom Chat Colors) \n\
+        1 = Tag user and warn other users in chat (requires SCP Redux) \n\
         2 = Kick user \n\
         3 = Ban user");
     cvarPermSiteBanTag = CreateConVar("bptf_perm_site_ban_tag", "[BPTF BAN]", 
-        "Chat tag for users who are permanently site banned from backpack.tf");
+        "Chat tag for users who are permanently site-banned from backpack.tf");
     cvarPermSiteBanTagColor = CreateConVar("bptf_perm_site_ban_tag_color", "F09A3F",
-        "Chat tag color for users who are permanently site banned from backpack.tf");
+        "Chat tag color for users who are permanently site-banned from backpack.tf");
     
 
     // Temp feature ban cvars
     cvarTempFeatureBanDealMethod = CreateConVar("bptf_temp_feature_ban_deal_method", "1", 
-        "How to deal with users who have a temporary feature ban on backpack.tf \n\
+        "How to deal with users who have a temporary feature-ban on backpack.tf \n\
         0 = Disabled \n\
-        1 = Tag banned user and warn other users in chat (requires Custom Chat Colors) \n\
+        1 = Tag user and warn other users in chat (requires SCP Redux) \n\
         2 = Kick user \n\
         3 = Ban user");
     cvarTempFeatureBanTag = CreateConVar("bptf_temp_feature_ban_tag", "[BPTF BAN]", 
-        "Chat tag for users who are temporarily feature banned from backpack.tf");
+        "Chat tag for users who are temporarily feature-banned from backpack.tf");
     cvarTempFeatureBanTagColor = CreateConVar("bptf_temp_feature_ban_tag_color", "F09A3F",
-        "Chat tag color for users who are temporarily feature banned from backpack.tf");
+        "Chat tag color for users who are temporarily feature-banned from backpack.tf");
     
     // Perm feature ban cvars
     cvarPermFeatureBanDealMethod = CreateConVar("bptf_perm_feature_ban_deal_method", "1", 
-        "How to deal with users who have a permanent feature ban on backpack.tf \n\
+        "How to deal with users who have a permanent feature-ban on backpack.tf \n\
         0 = Disabled \n\
-        1 = Tag banned user and warn other users in chat (requires Custom Chat Colors) \n\
+        1 = Tag user and warn other users in chat (requires SCP Redux) \n\
         2 = Kick user \n\
         3 = Ban user");
     cvarPermFeatureBanTag = CreateConVar("bptf_perm_feature_ban_tag", "[BPTF BAN]", 
-        "Chat tag for users who are permanently feature banned from backpack.tf");
+        "Chat tag for users who are permanently feature-banned from backpack.tf");
     cvarPermFeatureBanTagColor = CreateConVar("bptf_perm_feature_ban_tag_color", "F09A3F",
-        "Chat tag color for users who are permanently feature banned from backpack.tf");
+        "Chat tag color for users who are permanently feature-banned from backpack.tf");
     
 
     // Negative trust cvars
@@ -186,7 +186,7 @@ public void OnPluginStart()
     cvarNegativeTrustDealMethod = CreateConVar("bptf_negative_trust_deal_method", "1", 
         "How to deal with users with negative trusts >= bptf_negative_trust_threshold: \n\
         0 = Disabled \n\
-        1 = Tag banned user and warn other users in chat (requires Custom Chat Colors) \n\
+        1 = Tag user and warn other users in chat (requires SCP Redux) \n\
         2 = Kick user \n\
         3 = Ban user");
     cvarNegativeTrustTag = CreateConVar("bptf_negative_trust_tag", "[BPTF -REP]", 
@@ -194,10 +194,11 @@ public void OnPluginStart()
     cvarNegativeTrustTagColor = CreateConVar("bptf_negative_trust_color", "F09A3F",
         "Chat tag color for users with negative trusts >= bptf_negative_trust_threshold");
 
+    AutoExecConfig();
     
     // cmds
-    RegConsoleCmd("sm_rep", Command_CheckRep, "Check a user's backpack.tf reputation & ban status");
-    RegConsoleCmd("sm_baltop", Command_ValueLeaderboard, "Backpack value leaderboard of players in server");
+    RegConsoleCmd("sm_rep", Command_CheckRep, "Display a user's backpack.tf reputation & ban status");
+    RegConsoleCmd("sm_baltop", Command_ValueLeaderboard, "Backpack value leaderboard of players in the server");
 
     // push connected clients into api queue stack
     for(int i = 1; i <= MaxClients; i++)
